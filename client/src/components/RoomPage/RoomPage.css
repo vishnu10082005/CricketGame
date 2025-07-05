@@ -169,6 +169,14 @@
   animation: pulse 1s infinite;
 }
 
+.timer .auto-select-warning {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
 @keyframes pulse {
   0% {
     transform: scale(1);
@@ -271,6 +279,39 @@
   font-weight: 600;
   text-align: center;
   margin-top: 10px;
+}
+
+.team-progress {
+  background: #ffc107;
+  color: #212529;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.team-complete-message {
+  background: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.game-disabled {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid #f5c6cb;
+}
+
+.game-disabled p {
+  margin-bottom: 10px;
+  color: #721c24 !important;
 }
 
 .game-completed {

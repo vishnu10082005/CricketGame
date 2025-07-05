@@ -57,7 +57,7 @@ const RoomPage = ({ user, roomCode, onLeaveRoom }) => {
         ...prev,
         currentTurn: data.nextTurn,
         availablePlayers: data.availablePlayers,
-        timeLeft: 10,
+        timeLeft: 10, // Reset timer for next player
       }))
       setRoomData(data.roomState)
 
@@ -67,17 +67,17 @@ const RoomPage = ({ user, roomCode, onLeaveRoom }) => {
 
     // Update the selection-ended event handler
     newSocket.on("selection-ended", () => {
-      setGameState((prev) => ({ ...prev, isStarted: false }))
+      setGameState((prev) => ({ ...prev, isStarted: false, timeLeft: 0 }))
       setMessage("🎉 Game completed! Final teams displayed below.")
-      setRedirectCountdown(10) // Start 10 second countdown
+      setRedirectCountdown(5) // Start 5 second countdown
     })
 
     newSocket.on("game-completed", (data) => {
       setMessage(data.message)
-      setRedirectCountdown(2) // Final 2 second countdown
+      setRedirectCountdown(1) // Final 1 second countdown
       setTimeout(() => {
         onLeaveRoom()
-      }, 2000)
+      }, 1000)
     })
 
     newSocket.on("error", (data) => {
@@ -89,15 +89,18 @@ const RoomPage = ({ user, roomCode, onLeaveRoom }) => {
     }
   }, [roomCode, user, onLeaveRoom])
 
-  // Timer countdown effect for turns
+  // Timer countdown effect for turns - Fixed to count down properly
   useEffect(() => {
     let timer
     if (gameState.isStarted && gameState.currentTurn === user && gameState.timeLeft > 0) {
       timer = setInterval(() => {
-        setGameState((prev) => ({
-          ...prev,
-          timeLeft: prev.timeLeft - 1,
-        }))
+        setGameState((prev) => {
+          const newTimeLeft = prev.timeLeft - 1
+          return {
+            ...prev,
+            timeLeft: Math.max(0, newTimeLeft), // Ensure it doesn't go below 0
+          }
+        })
       }, 1000)
     }
     return () => clearInterval(timer)
@@ -137,6 +140,12 @@ const RoomPage = ({ user, roomCode, onLeaveRoom }) => {
   // Check if current user is host
   const isHost = roomData && roomData.host === user
   const isMyTurn = gameState.currentTurn === user
+
+  // Check if any player has completed their team (5 players)
+  const hasCompletedTeams = roomData?.players.some((p) => p.selectedPlayers.length >= 5) || false
+
+  // Check if current user's team is complete
+  const myTeamComplete = roomData?.players.find((p) => p.username === user)?.selectedPlayers.length >= 5
 
   return (
     <div className="room-container">
@@ -192,6 +201,13 @@ const RoomPage = ({ user, roomCode, onLeaveRoom }) => {
                 </div>
                 {/* Show completion status */}
                 {player.selectedPlayers.length === 5 && <div className="team-complete">✅ Team Complete!</div>}
+                {/* Show progress for incomplete teams */}
+                {player.selectedPlayers.length < 5 && gameState.isStarted && (
+                  <div className="team-progress">
+                    Need {5 - player.selectedPlayers.length} more player
+                    {5 - player.selectedPlayers.length !== 1 ? "s" : ""}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -225,14 +241,27 @@ const RoomPage = ({ user, roomCode, onLeaveRoom }) => {
               <h3>🎮 Game Setup</h3>
               {isHost ? (
                 <div className="host-controls">
-                  <p>You are the host. Start the game when ready!</p>
-                  <button className="btn btn-primary start-btn" onClick={handleStartGame}>
-                    🚀 Start Team Selection
-                  </button>
+                  {hasCompletedTeams ? (
+                    <div className="game-disabled">
+                      <p>⚠️ Cannot start game - some teams are already completed!</p>
+                      <p>All players must have 0 players to start a new game.</p>
+                    </div>
+                  ) : (
+                    <>
+                      <p>You are the host. Start the game when ready!</p>
+                      <button className="btn btn-primary start-btn" onClick={handleStartGame}>
+                        🚀 Start Team Selection
+                      </button>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="waiting-message">
-                  <p>⏳ Waiting for host to start the game...</p>
+                  {hasCompletedTeams ? (
+                    <p>⚠️ Game cannot start - teams already completed</p>
+                  ) : (
+                    <p>⏳ Waiting for host to start the game...</p>
+                  )}
                 </div>
               )}
             </div>
@@ -240,10 +269,18 @@ const RoomPage = ({ user, roomCode, onLeaveRoom }) => {
             <div className="game-active">
               <div className="turn-info">
                 <h3>{isMyTurn ? "🎯 Your Turn!" : `⏳ ${gameState.currentTurn}'s Turn`}</h3>
-                {isMyTurn && <div className="timer">⏰ Time left: {gameState.timeLeft}s</div>}
+                {isMyTurn && !myTeamComplete && (
+                  <div className="timer">
+                    ⏰ Time left: {gameState.timeLeft}s
+                    {gameState.timeLeft === 0 && <span className="auto-select-warning"> - Auto-selecting...</span>}
+                  </div>
+                )}
+                {myTeamComplete && isMyTurn && (
+                  <div className="team-complete-message">✅ Your team is complete! Waiting for others...</div>
+                )}
               </div>
 
-              {isMyTurn && (
+              {isMyTurn && !myTeamComplete && (
                 <div className="player-selection">
                   <h4>🏏 Select a Cricket Player:</h4>
                   <div className="selection-controls">
@@ -273,7 +310,7 @@ const RoomPage = ({ user, roomCode, onLeaveRoom }) => {
                     <div
                       key={index}
                       className={`available-player ${selectedPlayer === player ? "selected" : ""}`}
-                      onClick={() => isMyTurn && setSelectedPlayer(player)}
+                      onClick={() => isMyTurn && !myTeamComplete && setSelectedPlayer(player)}
                     >
                       {player}
                     </div>
