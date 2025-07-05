@@ -1,0 +1,155 @@
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.dashboard-card {
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 700px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.welcome-section h2 {
+  color: #333;
+  margin: 0 0 5px 0;
+  font-size: 28px;
+}
+
+.welcome-section p {
+  color: #666;
+  margin: 0;
+  font-size: 16px;
+}
+
+.logout-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+.game-info {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.game-info h3 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.game-info p {
+  color: #666;
+  font-size: 16px;
+}
+
+.room-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.action-card {
+  text-align: center;
+  padding: 30px 20px;
+  border: 2px solid #f0f0f0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.action-card:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+}
+
+.action-card h4 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.action-card p {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.action-btn {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.room-code-input {
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.game-rules {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  border-left: 4px solid #667eea;
+}
+
+.game-rules h4 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.game-rules ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.game-rules li {
+  color: #666;
+  margin-bottom: 8px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.game-rules li::before {
+  content: "⚡";
+  position: absolute;
+  left: 0;
+  color: #667eea;
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .room-actions {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .dashboard-card {
+    padding: 30px 20px;
+  }
+}
